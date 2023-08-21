@@ -1,0 +1,11 @@
+
+*.~dfm
+*.~ddp
+*.~pas
+eins.text
+*.exe
+*.dcu
+*.map
+*.bin
+test1.pas
+*.zip
