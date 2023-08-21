@@ -9,7 +9,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ComCtrls, JvComponentBase, JvZlibMultiple, JvBrowseFolder;
+  Dialogs, StdCtrls, ComCtrls, JvComponentBase, JvZlibMultiple, JvBrowseFolder,
+  JvCreateProcess;
 
 type
   TForm1 = class(TForm)
@@ -29,6 +30,7 @@ type
     jvzlib: TJvZlibMultiple;
     Button7: TButton;
     Button9: TButton;
+    JvCreateProcess1: TJvCreateProcess;
     procedure Button1Click(Sender: TObject);
     procedure Button6Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -126,13 +128,13 @@ var
 begin
   S1 := Trim(Edit1.Text);
 
-  if Length(S1) < 1  then exit else
-  if Length(S1) > 64 then exit ;
+  if Length(S1) < 1   then exit else
+  if Length(S1) > 128 then exit ;
 
   S1 := ExtractFileName( S1 );
   S1 := ChangeFileExt( S1, '' );
 
-  if FileList.IndexOf( S1 ) > -1 then
+  if FileListName.IndexOf( S1 ) > -1 then
   begin
     ShowMessage('item already exists.');
     exit;
@@ -151,18 +153,17 @@ var
 begin
   S1 := Trim(Edit1.Text);
 
-  if Length(S1) < 1  then exit else
-  if Length(S1) > 64 then exit ;
+  if Length(S1) < 1   then exit else
+  if Length(S1) > 128 then exit ;
 
   S1 := ExtractFileName( S1 );
   S1 := ChangeFileExt( S1, '' );
 
-  if FileList.IndexOf( S1 ) > -1 then
+  if FileListName.IndexOf( S1 ) > -1 then
   begin
     ShowMessage('item already exists.');
     exit;
   end;
-
   FileList    .Add( Edit1.Text );
   FileListName.Add( S1 );
   FileListType.Add( 'CERT' );
@@ -197,12 +198,19 @@ begin
     CreateDir(FileOutputDir);
   end;
 
+  RichEdit1.Lines.Clear;
+
   FL := TStringList.Create;
-  for i := 0 to FileList.Count - 1 do FL.Add( FileList.Strings[I] );
+  for I := 0 to FileList.Count - 1 do FL.Add( FileList.Strings[I] );
   for I := 0 to FileList.Count - 1 do
   begin
     FileList.Strings[I] := FileOutputDir + '\' +
     ChangeFileExt(ExtractFileName(FileList.Strings[I]), '.zip');
+
+    RichEdit1.Lines.Add(
+    FileListName.Strings[I] + #9 +
+    FileListType.Strings[I] + #9 + '"' +
+    FileList    .Strings[I]      + '"' );
   end;
 
   CF := TStringList.Create;
@@ -283,6 +291,24 @@ begin
       MS.Free;
     end;
   end;
+
+  RichEdit1.Lines.SaveToFile(Edit2.Text);
+
+  S1 := ExtractFilePath(Edit2.Text) + '\merge.bat';
+  if FileExists( S1 ) then
+  DeleteFile( S1 );
+
+  AssignFile( TF, S1 );
+  {$I+}
+  ReWrite( TF );
+  {$I-}
+  WriteLn( TF, 'brcc32.exe -fo"' +
+  ChangeFileExt(Edit2.Text,'.res"') + ' "' + Edit2.Text + '"');
+  CloseFile( TF );
+
+  JvCreateProcess1.CurrentDirectory := ExtractFilePath(Edit2.Text);
+  JvCreateProcess1.CommandLine := S1;
+  JvCreateProcess1.Run;
 end;
 
 procedure TForm1.Button7Click(Sender: TObject);
@@ -296,7 +322,7 @@ begin
     exit;
   end;
   FileOutputDir := S;
-  Edit2.Text := S;
+  Edit2.Text := S + '\packed.rc';
 end;
 
 procedure TForm1.Button9Click(Sender: TObject);

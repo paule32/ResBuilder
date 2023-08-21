@@ -9,3 +9,4 @@ eins.text
 *.bin
 test1.pas
 *.zip
+tmp/*

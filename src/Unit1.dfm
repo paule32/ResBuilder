@@ -235,4 +235,8 @@ object Form1: TForm1
     Left = 312
     Top = 160
   end
+  object JvCreateProcess1: TJvCreateProcess
+    Left = 208
+    Top = 344
+  end
 end
