@@ -25,7 +25,7 @@ implementation
 
 {$R *.dfm}
 uses
-  test1;
+  License;
 procedure TForm1.Button1Click(Sender: TObject);
 var
   b: Integer;
@@ -36,10 +36,10 @@ begin
   if not(DirectoryExists('temp')) then
   CreateDir('temp');
 
-  SetLength(theData,Length(TByteArray_test1)-1);
-  for b := 0 to Length(TByteArray_test1)-1 do
+  SetLength(theData,Length(TByteArray_License)-1);
+  for b := 0 to Length(TByteArray_License)-1 do
   begin
-    theData[b] := TByteArray_test1[b];
+    theData[b] := TByteArray_License[b];
   end;
 
   theStream := TMemoryStream.Create;
@@ -53,7 +53,7 @@ begin
   end;
 
   z.DecompressFile('temp\XBytes.bin','temp',true);
-  RichEdit1.Lines.LoadFromFile('temp\Example.pas');
+  RichEdit1.Lines.LoadFromFile('temp\License');
 end;
 
 end.
